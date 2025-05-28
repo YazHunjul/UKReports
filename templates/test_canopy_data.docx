@@ -1,0 +1,22 @@
+This will be a Word document template, but I'll create it as a text representation first to show the structure:
+
+CANOPY COMMISSIONING REPORT
+
+Client: {{ client_name }}
+Project: {{ project_name }}
+Date: {{ date_of_visit }}
+Engineer: {{ engineer_name }}
+
+CANOPY DETAILS:
+
+{% for canopy in canopies %}
+Canopy {{ canopy.index }}:
+- Drawing Number: {{ canopy.drawing_number }}
+- Location: {{ canopy.canopy_location }}
+- Model: {{ canopy.canopy_model }}
+- Design Airflow: {{ canopy.design_airflow }} m³/s
+- Supply Airflow: {{ canopy.supply_airflow }} m³/s
+
+{% endfor %}
+
+Generated on: {{ generation_date }} at {{ generation_time }} 

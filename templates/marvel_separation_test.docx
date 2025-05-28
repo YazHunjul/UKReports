@@ -1,0 +1,58 @@
+CANOPY COMMISSIONING REPORT - MARVEL SEPARATION TEST
+
+Client: {{ client_name }}
+Project: {{ project_name }}
+Date: {{ date_of_visit }}
+Engineer: {{ engineer_name }}
+
+SUMMARY:
+- Total Canopies: {{ num_canopies }}
+- Standard Canopies: {{ standard_canopies|length }}
+- Marvel Canopies: {{ marvel_canopies|length }}
+
+=== STANDARD CANOPIES ===
+{% for canopy in standard_canopies %}
+Canopy {{ canopy.index }}: {{ canopy.canopy_model }}
+Location: {{ canopy.canopy_location }}
+Drawing: {{ canopy.drawing_number }}
+Design Airflow: {{ canopy.design_airflow }} m³/s
+Supply Airflow: {{ canopy.supply_airflow }} m³/s
+
+{% for section in canopy.sections %}
+  Section {{ section.index }}:
+  - Extract: {{ section.extract_ksa }} KSAs, {{ section.extract_tab_reading }} Pa
+  - K-Factor: {{ section.extract_k_factor }}
+  - Flowrate: {{ section.extract_flowrate_m3h }} m³/h
+  {% if section.supply_plenum_length %}
+  - Supply: {{ section.supply_plenum_length }}mm, {{ section.supply_tab_reading }} Pa
+  - Supply K-Factor: {{ section.supply_k_factor }}
+  - Supply Flowrate: {{ section.supply_flowrate_m3h }} m³/h
+  {% endif %}
+{% endfor %}
+
+{% endfor %}
+
+=== MARVEL TECHNOLOGY CANOPIES ===
+{% for canopy in marvel_canopies %}
+Canopy {{ canopy.index }}: {{ canopy.canopy_model }} (WITH MARVEL)
+Location: {{ canopy.canopy_location }}
+Drawing: {{ canopy.drawing_number }}
+Design Airflow: {{ canopy.design_airflow }} m³/s
+Supply Airflow: {{ canopy.supply_airflow }} m³/s
+
+{% for section in canopy.sections %}
+  Section {{ section.index }}:
+  - Extract: {{ section.extract_ksa }} KSAs, {{ section.extract_tab_reading }} Pa
+  - K-Factor: {{ section.extract_k_factor }}
+  - Flowrate: {{ section.extract_flowrate_m3h }} m³/h
+  {% if section.supply_plenum_length %}
+  - Supply: {{ section.supply_plenum_length }}mm, {{ section.supply_tab_reading }} Pa
+  - Supply K-Factor: {{ section.supply_k_factor }}
+  - Supply Flowrate: {{ section.supply_flowrate_m3h }} m³/h
+  {% endif %}
+  - MARVEL SETTINGS: Min {{ section.min_percent }}% | Idle {{ section.idle_percent }}% | Design {{ section.design_percent }}%
+{% endfor %}
+
+{% endfor %}
+
+Generated: {{ generation_date }} at {{ generation_time }} 
