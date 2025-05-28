@@ -428,8 +428,8 @@ def render_single_canopy(canopy_index: int):
         supply_airflow_value = st.session_state.get(supply_key, 0.0)
         number_of_sections_value = 1  # Length-based models don't use sections
         
-    else:
-        # Section-based models
+    elif canopy_model_value:
+        # Section-based models (when model is selected but not special cases above)
         col1, col2, col3 = st.columns(3)
         
         # Initialize session state for section-based fields
@@ -476,6 +476,11 @@ def render_single_canopy(canopy_index: int):
         design_airflow_value = st.session_state.get(design_key, 0.0)
         supply_airflow_value = st.session_state.get(supply_key, 0.0)
         canopy_length_value = None  # Section-based models don't use length
+    
+    else:
+        # No model selected - use default values (already initialized above)
+        # Just show info message
+        st.info("ℹ️ Please select a canopy model to configure technical specifications")
     
     # Update the canopy data
     canopy_data = {
