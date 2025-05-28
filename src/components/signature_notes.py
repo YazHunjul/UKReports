@@ -78,7 +78,20 @@ def render_signature_and_notes():
     
     # Initialize session state values if not exists
     if 'signature_date' not in st.session_state:
-        st.session_state.signature_date = get_form_data('signature_date', datetime.now().date())
+        saved_date = get_form_data('signature_date', datetime.now().date())
+        # Ensure we have a proper date object
+        if isinstance(saved_date, str):
+            try:
+                # Try to parse string date in various formats
+                if '/' in saved_date:
+                    saved_date = datetime.strptime(saved_date, '%Y/%m/%d').date()
+                elif '-' in saved_date:
+                    saved_date = datetime.strptime(saved_date, '%Y-%m-%d').date()
+                else:
+                    saved_date = datetime.now().date()
+            except:
+                saved_date = datetime.now().date()
+        st.session_state.signature_date = saved_date
     if 'print_name' not in st.session_state:
         st.session_state.print_name = get_form_data('print_name', engineer_name)
     
