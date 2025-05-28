@@ -87,6 +87,7 @@ def render_signature_and_notes():
     with col1:
         signature_date = st.date_input(
             "Date",
+            value=st.session_state.signature_date,
             key="signature_date",
             help="Date of signature"
         )
@@ -94,6 +95,7 @@ def render_signature_and_notes():
     with col2:
         print_name = st.text_input(
             "Print Name",
+            value=st.session_state.print_name,
             key="print_name",
             placeholder="Enter your full name",
             help="Print your full name clearly"

@@ -479,6 +479,17 @@ def render_single_canopy(canopy_index: int):
     
     else:
         # No model selected - use default values (already initialized above)
+        # Update values from session state or use defaults
+        design_key = f"design_airflow_{canopy_index}"
+        supply_key = f"supply_airflow_{canopy_index}"
+        sections_key = f"number_of_sections_{canopy_index}"
+        
+        # Get values from session state if they exist, otherwise use defaults
+        design_airflow_value = st.session_state.get(design_key, canopy.get('design_airflow', 0.0))
+        supply_airflow_value = st.session_state.get(supply_key, canopy.get('supply_airflow', 0.0))
+        number_of_sections_value = st.session_state.get(sections_key, canopy.get('number_of_sections', 1))
+        canopy_length_value = None
+        
         # Just show info message
         st.info("ℹ️ Please select a canopy model to configure technical specifications")
     
