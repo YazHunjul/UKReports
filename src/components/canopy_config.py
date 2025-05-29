@@ -5,6 +5,24 @@ from src.components.water_wash_checklist import render_water_wash_checklist_for_
 
 import pandas as pd
 
+def safe_float(value, default=0.0):
+    """Safely convert a value to float, handling string inputs from session state."""
+    try:
+        if value is None:
+            return default
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
+def safe_int(value, default=1):
+    """Safely convert a value to int, handling string inputs from session state."""
+    try:
+        if value is None:
+            return default
+        return int(float(value))  # Convert via float first to handle "1.0" strings
+    except (ValueError, TypeError):
+        return default
+
 def render_canopy_configuration():
     """Render the canopy configuration component."""
     st.header("🏭 Canopy Configuration")
@@ -189,9 +207,9 @@ def render_single_canopy(canopy_index: int):
         if grill_key not in st.session_state:
             st.session_state[grill_key] = canopy.get('grill_size', '')
         if grills_key not in st.session_state:
-            st.session_state[grills_key] = canopy.get('number_of_sections', 1)
+            st.session_state[grills_key] = safe_int(canopy.get('number_of_sections', 1))
         if design_key not in st.session_state:
-            st.session_state[design_key] = canopy.get('design_airflow', 0.0)
+            st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         
         with col1:
             grill_size = st.text_input(
@@ -237,9 +255,9 @@ def render_single_canopy(canopy_index: int):
         slot_width_key = f"slot_width_{canopy_index}"
         
         if slot_length_key not in st.session_state:
-            st.session_state[slot_length_key] = canopy.get('slot_length', 0)
+            st.session_state[slot_length_key] = safe_float(canopy.get('slot_length', 0))
         if slot_width_key not in st.session_state:
-            st.session_state[slot_width_key] = canopy.get('slot_width', 85)
+            st.session_state[slot_width_key] = safe_float(canopy.get('slot_width', 85))
         
         with col1:
             slot_length = st.number_input(
@@ -267,11 +285,11 @@ def render_single_canopy(canopy_index: int):
         supply_key = f"supply_airflow_{canopy_index}"
         
         if sections_key not in st.session_state:
-            st.session_state[sections_key] = canopy.get('number_of_sections', 1)
+            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1))
         if design_key not in st.session_state:
-            st.session_state[design_key] = canopy.get('design_airflow', 0.0)
+            st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         if supply_key not in st.session_state:
-            st.session_state[supply_key] = canopy.get('supply_airflow', 0.0)
+            st.session_state[supply_key] = safe_float(canopy.get('supply_airflow', 0.0))
         
         with col1:
             number_of_sections = st.number_input(
@@ -318,9 +336,9 @@ def render_single_canopy(canopy_index: int):
         slot_width_key = f"slot_width_{canopy_index}"
         
         if slot_length_key not in st.session_state:
-            st.session_state[slot_length_key] = canopy.get('slot_length', 0)
+            st.session_state[slot_length_key] = safe_float(canopy.get('slot_length', 0))
         if slot_width_key not in st.session_state:
-            st.session_state[slot_width_key] = canopy.get('slot_width', 85)
+            st.session_state[slot_width_key] = safe_float(canopy.get('slot_width', 85))
         
         with col1:
             slot_length = st.number_input(
@@ -347,9 +365,9 @@ def render_single_canopy(canopy_index: int):
         design_key = f"design_airflow_{canopy_index}"
         
         if sections_key not in st.session_state:
-            st.session_state[sections_key] = canopy.get('number_of_sections', 1)
+            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1))
         if design_key not in st.session_state:
-            st.session_state[design_key] = canopy.get('design_airflow', 0.0)
+            st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         
         with col1:
             number_of_sections = st.number_input(
@@ -388,11 +406,11 @@ def render_single_canopy(canopy_index: int):
         supply_key = f"supply_airflow_{canopy_index}"
         
         if length_key not in st.session_state:
-            st.session_state[length_key] = canopy.get('canopy_length', 1000)
+            st.session_state[length_key] = safe_int(canopy.get('canopy_length', 1000))
         if design_key not in st.session_state:
-            st.session_state[design_key] = canopy.get('design_airflow', 0.0)
+            st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         if supply_key not in st.session_state:
-            st.session_state[supply_key] = canopy.get('supply_airflow', 0.0)
+            st.session_state[supply_key] = safe_float(canopy.get('supply_airflow', 0.0))
         
         with col1:
             canopy_length = st.number_input(
@@ -423,9 +441,9 @@ def render_single_canopy(canopy_index: int):
             )
         
         # Update values from session state
-        canopy_length_value = st.session_state.get(length_key, 1000)
-        design_airflow_value = st.session_state.get(design_key, 0.0)
-        supply_airflow_value = st.session_state.get(supply_key, 0.0)
+        canopy_length_value = safe_int(st.session_state.get(length_key, 1000))
+        design_airflow_value = safe_float(st.session_state.get(design_key, 0.0))
+        supply_airflow_value = safe_float(st.session_state.get(supply_key, 0.0))
         number_of_sections_value = 1  # Length-based models don't use sections
         
     elif canopy_model_value:
@@ -438,11 +456,11 @@ def render_single_canopy(canopy_index: int):
         supply_key = f"supply_airflow_{canopy_index}"
         
         if sections_key not in st.session_state:
-            st.session_state[sections_key] = canopy.get('number_of_sections', 1)
+            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1))
         if design_key not in st.session_state:
-            st.session_state[design_key] = canopy.get('design_airflow', 0.0)
+            st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         if supply_key not in st.session_state:
-            st.session_state[supply_key] = canopy.get('supply_airflow', 0.0)
+            st.session_state[supply_key] = safe_float(canopy.get('supply_airflow', 0.0))
         
         with col1:
             number_of_sections = st.number_input(
@@ -472,9 +490,9 @@ def render_single_canopy(canopy_index: int):
             )
         
         # Update values from session state
-        number_of_sections_value = st.session_state.get(sections_key, 1)
-        design_airflow_value = st.session_state.get(design_key, 0.0)
-        supply_airflow_value = st.session_state.get(supply_key, 0.0)
+        number_of_sections_value = safe_int(st.session_state.get(sections_key, 1))
+        design_airflow_value = safe_float(st.session_state.get(design_key, 0.0))
+        supply_airflow_value = safe_float(st.session_state.get(supply_key, 0.0))
         canopy_length_value = None  # Section-based models don't use length
     
     else:
@@ -485,9 +503,9 @@ def render_single_canopy(canopy_index: int):
         sections_key = f"number_of_sections_{canopy_index}"
         
         # Get values from session state if they exist, otherwise use defaults
-        design_airflow_value = st.session_state.get(design_key, canopy.get('design_airflow', 0.0))
-        supply_airflow_value = st.session_state.get(supply_key, canopy.get('supply_airflow', 0.0))
-        number_of_sections_value = st.session_state.get(sections_key, canopy.get('number_of_sections', 1))
+        design_airflow_value = safe_float(st.session_state.get(design_key, canopy.get('design_airflow', 0.0)))
+        supply_airflow_value = safe_float(st.session_state.get(supply_key, canopy.get('supply_airflow', 0.0)))
+        number_of_sections_value = safe_int(st.session_state.get(sections_key, canopy.get('number_of_sections', 1)))
         canopy_length_value = None
         
         # Just show info message
@@ -585,7 +603,7 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
         # Initialize session state for CXW section fields
         anemometer_key = f"anemometer_reading_{canopy_index}_{section_idx}"
         if anemometer_key not in st.session_state:
-            st.session_state[anemometer_key] = section.get('anemometer_reading', 0.0)
+            st.session_state[anemometer_key] = safe_float(section.get('anemometer_reading', 0.0))
         
         with col1:
             anemometer_reading = st.number_input(
@@ -628,11 +646,11 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
             design_key = f"design_m3s_{canopy_index}_{section_idx}"
             
             if min_key not in st.session_state:
-                st.session_state[min_key] = section.get('min_percent', 0.0)
+                st.session_state[min_key] = safe_float(section.get('min_percent', 0.0))
             if idle_key not in st.session_state:
-                st.session_state[idle_key] = section.get('idle_percent', 0.0)
+                st.session_state[idle_key] = safe_float(section.get('idle_percent', 0.0))
             if design_key not in st.session_state:
-                st.session_state[design_key] = section.get('design_m3s', 0.0)
+                st.session_state[design_key] = safe_float(section.get('design_m3s', 0.0))
             
             with col1:
                 min_percent = st.number_input(
@@ -693,7 +711,7 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
         # Initialize session state for CMWF extract fields
         anemometer_key = f"anemometer_reading_{canopy_index}_{section_idx}"
         if anemometer_key not in st.session_state:
-            st.session_state[anemometer_key] = section.get('anemometer_reading', 0.0)
+            st.session_state[anemometer_key] = safe_float(section.get('anemometer_reading', 0.0))
         
         with col1:
             anemometer_reading = st.number_input(
@@ -727,7 +745,7 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
         # Initialize session state for CMWF supply fields
         supply_anemometer_key = f"supply_anemometer_reading_{canopy_index}_{section_idx}"
         if supply_anemometer_key not in st.session_state:
-            st.session_state[supply_anemometer_key] = section.get('supply_anemometer_reading', 0.0)
+            st.session_state[supply_anemometer_key] = safe_float(section.get('supply_anemometer_reading', 0.0))
         
         with col1:
             supply_anemometer_reading = st.number_input(
@@ -773,11 +791,11 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
             design_key = f"design_m3s_{canopy_index}_{section_idx}"
             
             if min_key not in st.session_state:
-                st.session_state[min_key] = section.get('min_percent', 0.0)
+                st.session_state[min_key] = safe_float(section.get('min_percent', 0.0))
             if idle_key not in st.session_state:
-                st.session_state[idle_key] = section.get('idle_percent', 0.0)
+                st.session_state[idle_key] = safe_float(section.get('idle_percent', 0.0))
             if design_key not in st.session_state:
-                st.session_state[design_key] = section.get('design_m3s', 0.0)
+                st.session_state[design_key] = safe_float(section.get('design_m3s', 0.0))
             
             with col1:
                 min_percent = st.number_input(
@@ -838,7 +856,7 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
         # Initialize session state for CMWI extract fields
         anemometer_key = f"anemometer_reading_{canopy_index}_{section_idx}"
         if anemometer_key not in st.session_state:
-            st.session_state[anemometer_key] = section.get('anemometer_reading', 0.0)
+            st.session_state[anemometer_key] = safe_float(section.get('anemometer_reading', 0.0))
         
         with col1:
             anemometer_reading = st.number_input(
@@ -881,11 +899,11 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
             design_key = f"design_m3s_{canopy_index}_{section_idx}"
             
             if min_key not in st.session_state:
-                st.session_state[min_key] = section.get('min_percent', 0.0)
+                st.session_state[min_key] = safe_float(section.get('min_percent', 0.0))
             if idle_key not in st.session_state:
-                st.session_state[idle_key] = section.get('idle_percent', 0.0)
+                st.session_state[idle_key] = safe_float(section.get('idle_percent', 0.0))
             if design_key not in st.session_state:
-                st.session_state[design_key] = section.get('design_m3s', 0.0)
+                st.session_state[design_key] = safe_float(section.get('design_m3s', 0.0))
             
             with col1:
                 min_percent = st.number_input(
@@ -1038,11 +1056,11 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
             design_key = f"design_m3s_{canopy_index}_{section_idx}"
             
             if min_key not in st.session_state:
-                st.session_state[min_key] = section.get('min_percent', 0.0)
+                st.session_state[min_key] = safe_float(section.get('min_percent', 0.0))
             if idle_key not in st.session_state:
-                st.session_state[idle_key] = section.get('idle_percent', 0.0)
+                st.session_state[idle_key] = safe_float(section.get('idle_percent', 0.0))
             if design_key not in st.session_state:
-                st.session_state[design_key] = section.get('design_m3s', 0.0)
+                st.session_state[design_key] = safe_float(section.get('design_m3s', 0.0))
             
             with col1:
                 min_percent = st.number_input(
