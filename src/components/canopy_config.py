@@ -14,12 +14,21 @@ def safe_float(value, default=0.0):
     except (ValueError, TypeError):
         return default
 
-def safe_int(value, default=1):
-    """Safely convert a value to int, handling string inputs from session state."""
+def safe_int(value, default=1, min_value=None, max_value=None):
+    """Safely convert a value to int, handling string inputs from session state and respecting min/max limits."""
     try:
         if value is None:
-            return default
-        return int(float(value))  # Convert via float first to handle "1.0" strings
+            result = default
+        else:
+            result = int(float(value))  # Convert via float first to handle "1.0" strings
+        
+        # Apply min/max constraints
+        if min_value is not None and result < min_value:
+            result = min_value
+        if max_value is not None and result > max_value:
+            result = max_value
+            
+        return result
     except (ValueError, TypeError):
         return default
 
@@ -38,7 +47,7 @@ def render_canopy_configuration():
     
     # Initialize session state for number of canopies if not exists
     if 'num_canopies' not in st.session_state:
-        st.session_state.num_canopies = get_form_data('num_canopies', 1)
+        st.session_state.num_canopies = safe_int(get_form_data('num_canopies', 1), min_value=1, max_value=MAX_CANOPIES)
     
     # Number of canopies
     num_canopies = st.number_input(
@@ -50,7 +59,7 @@ def render_canopy_configuration():
     )
     
     # Get the value from session state
-    num_canopies_value = st.session_state.get('num_canopies', 1)
+    num_canopies_value = safe_int(st.session_state.get('num_canopies', 1), min_value=1, max_value=MAX_CANOPIES)
     
     update_form_data({'num_canopies': num_canopies_value})
     initialize_canopy_data(num_canopies_value)
@@ -216,7 +225,7 @@ def render_single_canopy(canopy_index: int):
         if grill_key not in st.session_state:
             st.session_state[grill_key] = safe_str(canopy.get('grill_size', ''))
         if grills_key not in st.session_state:
-            st.session_state[grills_key] = safe_int(canopy.get('number_of_sections', 1))
+            st.session_state[grills_key] = safe_int(canopy.get('number_of_sections', 1), min_value=1, max_value=MAX_SECTIONS)
         if design_key not in st.session_state:
             st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         
@@ -294,7 +303,7 @@ def render_single_canopy(canopy_index: int):
         supply_key = f"supply_airflow_{canopy_index}"
         
         if sections_key not in st.session_state:
-            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1))
+            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1), min_value=1, max_value=MAX_SECTIONS)
         if design_key not in st.session_state:
             st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         if supply_key not in st.session_state:
@@ -330,9 +339,9 @@ def render_single_canopy(canopy_index: int):
         # Update values from session state
         slot_length = st.session_state.get(slot_length_key, 0)
         slot_width = st.session_state.get(slot_width_key, 85)
-        number_of_sections_value = st.session_state.get(sections_key, 1)
-        design_airflow_value = st.session_state.get(design_key, 0.0)
-        supply_airflow_value = st.session_state.get(supply_key, 0.0)
+        number_of_sections_value = safe_int(st.session_state.get(sections_key, 1), min_value=1, max_value=MAX_SECTIONS)
+        design_airflow_value = safe_float(st.session_state.get(design_key, 0.0))
+        supply_airflow_value = safe_float(st.session_state.get(supply_key, 0.0))
         canopy_length_value = None
         
     # Handle CMWI models specially (extract only, no supply)
@@ -374,7 +383,7 @@ def render_single_canopy(canopy_index: int):
         design_key = f"design_airflow_{canopy_index}"
         
         if sections_key not in st.session_state:
-            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1))
+            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1), min_value=1, max_value=MAX_SECTIONS)
         if design_key not in st.session_state:
             st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         
@@ -399,8 +408,8 @@ def render_single_canopy(canopy_index: int):
         # Update values from session state
         slot_length = st.session_state.get(slot_length_key, 0)
         slot_width = st.session_state.get(slot_width_key, 85)
-        number_of_sections_value = st.session_state.get(sections_key, 1)
-        design_airflow_value = st.session_state.get(design_key, 0.0)
+        number_of_sections_value = safe_int(st.session_state.get(sections_key, 1), min_value=1, max_value=MAX_SECTIONS)
+        design_airflow_value = safe_float(st.session_state.get(design_key, 0.0))
         supply_airflow_value = 0.0  # CMWI models don't have supply airflow
         canopy_length_value = None
     
@@ -415,7 +424,7 @@ def render_single_canopy(canopy_index: int):
         supply_key = f"supply_airflow_{canopy_index}"
         
         if length_key not in st.session_state:
-            st.session_state[length_key] = safe_int(canopy.get('canopy_length', 1000))
+            st.session_state[length_key] = safe_int(canopy.get('canopy_length', 1000), min_value=1000, max_value=4000)
         if design_key not in st.session_state:
             st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         if supply_key not in st.session_state:
@@ -450,7 +459,7 @@ def render_single_canopy(canopy_index: int):
             )
         
         # Update values from session state
-        canopy_length_value = safe_int(st.session_state.get(length_key, 1000))
+        canopy_length_value = safe_int(st.session_state.get(length_key, 1000), min_value=1000, max_value=4000)
         design_airflow_value = safe_float(st.session_state.get(design_key, 0.0))
         supply_airflow_value = safe_float(st.session_state.get(supply_key, 0.0))
         number_of_sections_value = 1  # Length-based models don't use sections
@@ -465,7 +474,7 @@ def render_single_canopy(canopy_index: int):
         supply_key = f"supply_airflow_{canopy_index}"
         
         if sections_key not in st.session_state:
-            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1))
+            st.session_state[sections_key] = safe_int(canopy.get('number_of_sections', 1), min_value=1, max_value=MAX_SECTIONS)
         if design_key not in st.session_state:
             st.session_state[design_key] = safe_float(canopy.get('design_airflow', 0.0))
         if supply_key not in st.session_state:
@@ -499,7 +508,7 @@ def render_single_canopy(canopy_index: int):
             )
         
         # Update values from session state
-        number_of_sections_value = safe_int(st.session_state.get(sections_key, 1))
+        number_of_sections_value = safe_int(st.session_state.get(sections_key, 1), min_value=1, max_value=MAX_SECTIONS)
         design_airflow_value = safe_float(st.session_state.get(design_key, 0.0))
         supply_airflow_value = safe_float(st.session_state.get(supply_key, 0.0))
         canopy_length_value = None  # Section-based models don't use length
@@ -514,7 +523,7 @@ def render_single_canopy(canopy_index: int):
         # Get values from session state if they exist, otherwise use defaults
         design_airflow_value = safe_float(st.session_state.get(design_key, canopy.get('design_airflow', 0.0)))
         supply_airflow_value = safe_float(st.session_state.get(supply_key, canopy.get('supply_airflow', 0.0)))
-        number_of_sections_value = safe_int(st.session_state.get(sections_key, canopy.get('number_of_sections', 1)))
+        number_of_sections_value = safe_int(st.session_state.get(sections_key, canopy.get('number_of_sections', 1)), min_value=1, max_value=MAX_SECTIONS)
         canopy_length_value = None
         
         # Just show info message
