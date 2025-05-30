@@ -23,6 +23,15 @@ def safe_int(value, default=1):
     except (ValueError, TypeError):
         return default
 
+def safe_str(value, default=''):
+    """Safely convert a value to string, handling None and other types from session state."""
+    try:
+        if value is None:
+            return default
+        return str(value)
+    except (ValueError, TypeError):
+        return default
+
 def render_canopy_configuration():
     """Render the canopy configuration component."""
     st.header("🏭 Canopy Configuration")
@@ -67,11 +76,11 @@ def render_single_canopy(canopy_index: int):
     model_key = f"canopy_model_{canopy_index}"
     
     if drawing_key not in st.session_state:
-        st.session_state[drawing_key] = canopy.get('drawing_number', '')
+        st.session_state[drawing_key] = safe_str(canopy.get('drawing_number', ''))
     if location_key not in st.session_state:
-        st.session_state[location_key] = canopy.get('canopy_location', '')
+        st.session_state[location_key] = safe_str(canopy.get('canopy_location', ''))
     if model_key not in st.session_state:
-        st.session_state[model_key] = canopy.get('canopy_model', '')
+        st.session_state[model_key] = safe_str(canopy.get('canopy_model', ''))
     
     # First row: Basic info
     col1, col2, col3 = st.columns(3)
@@ -205,7 +214,7 @@ def render_single_canopy(canopy_index: int):
         design_key = f"design_airflow_{canopy_index}"
         
         if grill_key not in st.session_state:
-            st.session_state[grill_key] = canopy.get('grill_size', '')
+            st.session_state[grill_key] = safe_str(canopy.get('grill_size', ''))
         if grills_key not in st.session_state:
             st.session_state[grills_key] = safe_int(canopy.get('number_of_sections', 1))
         if design_key not in st.session_state:
@@ -971,7 +980,7 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
                 st.session_state[extract_ksa_key] = None
         
         if extract_tab_key not in st.session_state:
-            st.session_state[extract_tab_key] = section.get('extract_tab_reading', '')
+            st.session_state[extract_tab_key] = safe_str(section.get('extract_tab_reading', ''))
         
         with col1:
             # KSA selection dropdown for extract
@@ -1019,7 +1028,7 @@ def render_single_section(canopy_index: int, section_idx: int, with_marvel: bool
                 st.session_state[supply_plenum_key] = default_plenum if default_plenum in plenum_lengths else 1000
             
             if supply_tab_key not in st.session_state:
-                st.session_state[supply_tab_key] = section.get('supply_tab_reading', '')
+                st.session_state[supply_tab_key] = safe_str(section.get('supply_tab_reading', ''))
             
             with col1:
                 # Plenum Length dropdown for supply
